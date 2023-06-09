@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/owncast/owncast/core/data"
-	"github.com/owncast/owncast/router/middleware"
 	"github.com/owncast/owncast/static"
 	"github.com/owncast/owncast/utils"
+	"github.com/owncast/owncast/webserver/middleware"
 )
 
 // IndexHandler handles the default index route.
