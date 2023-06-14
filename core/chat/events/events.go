@@ -7,13 +7,13 @@ import (
 	"time"
 
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/owncast/owncast/models"
 	"github.com/teris-io/shortid"
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/renderer/html"
 	"mvdan.cc/xurls"
 
-	"github.com/owncast/owncast/core/user"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -35,9 +35,9 @@ type Event struct {
 
 // UserEvent is an event with an associated user.
 type UserEvent struct {
-	User     *user.User `json:"user"`
-	HiddenAt *time.Time `json:"hiddenAt,omitempty"`
-	ClientID uint       `json:"clientId,omitempty"`
+	User     *models.User `json:"user"`
+	HiddenAt *time.Time   `json:"hiddenAt,omitempty"`
+	ClientID uint         `json:"clientId,omitempty"`
 }
 
 // MessageEvent is an event that has a message body.
