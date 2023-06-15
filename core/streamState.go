@@ -11,9 +11,9 @@ import (
 	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/chat"
 	"github.com/owncast/owncast/core/data"
-	"github.com/owncast/owncast/core/webhooks"
 	"github.com/owncast/owncast/models"
 	"github.com/owncast/owncast/services/notifications"
+	"github.com/owncast/owncast/services/webhooks"
 	"github.com/owncast/owncast/utils"
 	"github.com/owncast/owncast/video/rtmp"
 	"github.com/owncast/owncast/video/transcoder"
@@ -68,7 +68,8 @@ func setStreamAsConnected(rtmpOut *io.PipeReader) {
 		_transcoder.Start(true)
 	}()
 
-	go webhooks.SendStreamStatusEvent(models.StreamStarted)
+	webhookManager := webhooks.GetWebhooks()
+	go webhookManager.SendStreamStatusEvent(models.StreamStarted)
 	transcoder.StartThumbnailGenerator(segmentPath, data.FindHighestVideoQualityIndex(_currentBroadcast.OutputSettings))
 
 	_ = chat.SendSystemAction("Stay tuned, the stream is **starting**!", true)
@@ -125,7 +126,8 @@ func SetStreamAsDisconnected() {
 	stopOnlineCleanupTimer()
 	saveStats()
 
-	go webhooks.SendStreamStatusEvent(models.StreamStopped)
+	webhookManager := webhooks.GetWebhooks()
+	go webhookManager.SendStreamStatusEvent(models.StreamStopped)
 }
 
 // StartOfflineCleanupTimer will fire a cleanup after n minutes being disconnected.

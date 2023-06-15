@@ -14,9 +14,9 @@ import (
 	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/chat/events"
 	"github.com/owncast/owncast/core/data"
-	"github.com/owncast/owncast/core/webhooks"
 	"github.com/owncast/owncast/models"
 	"github.com/owncast/owncast/services/geoip"
+	"github.com/owncast/owncast/services/webhooks"
 	"github.com/owncast/owncast/storage"
 	"github.com/owncast/owncast/utils"
 )
@@ -141,7 +141,8 @@ func (s *Server) sendUserJoinedMessage(c *Client) {
 	}
 
 	// Send chat user joined webhook
-	webhooks.SendChatEventUserJoined(userJoinedEvent)
+	webhookManager := webhooks.GetWebhooks()
+	webhookManager.SendChatEventUserJoined(userJoinedEvent)
 }
 
 // ClientClosed is fired when a client disconnects or connection is dropped.
