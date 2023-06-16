@@ -8,8 +8,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/data"
+	"github.com/owncast/owncast/services/config"
 )
 
 // LocalStorage represents an instance of the local storage provider for HLS video.
@@ -56,7 +56,8 @@ func (s *LocalStorage) Cleanup() error {
 	// Determine how many files we should keep on disk
 	maxNumber := data.GetStreamLatencyLevel().SegmentCount
 	buffer := 10
-	baseDirectory := config.HLSStoragePath
+	c := config.GetConfig()
+	baseDirectory := c.HLSStoragePath
 
 	files, err := getAllFilesRecursive(baseDirectory)
 	if err != nil {

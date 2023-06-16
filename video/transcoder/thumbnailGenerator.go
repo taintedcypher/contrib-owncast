@@ -10,8 +10,8 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/data"
+	"github.com/owncast/owncast/services/config"
 	"github.com/owncast/owncast/utils"
 )
 
@@ -48,9 +48,11 @@ func StartThumbnailGenerator(chunkPath string, variantIndex int) {
 }
 
 func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
+	c := config.GetConfig()
+
 	// JPG takes less time to encode than PNG
-	outputFile := path.Join(config.TempDir, "thumbnail.jpg")
-	previewGifFile := path.Join(config.TempDir, "preview.gif")
+	outputFile := path.Join(c.TempDir, "thumbnail.jpg")
+	previewGifFile := path.Join(c.TempDir, "preview.gif")
 
 	framePath := path.Join(segmentPath, strconv.Itoa(variantIndex))
 	files, err := os.ReadDir(framePath)
@@ -87,7 +89,7 @@ func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
 
 	mostRecentFile := path.Join(framePath, names[0])
 	ffmpegPath := utils.ValidatedFfmpegPath(data.GetFfMpegPath())
-	outputFileTemp := path.Join(config.TempDir, "tempthumbnail.jpg")
+	outputFileTemp := path.Join(c.TempDir, "tempthumbnail.jpg")
 
 	thumbnailCmdFlags := []string{
 		ffmpegPath,
@@ -116,8 +118,9 @@ func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
 }
 
 func makeAnimatedGifPreview(sourceFile string, outputFile string) {
+	c := config.GetConfig()
 	ffmpegPath := utils.ValidatedFfmpegPath(data.GetFfMpegPath())
-	outputFileTemp := path.Join(config.TempDir, "temppreview.gif")
+	outputFileTemp := path.Join(c.TempDir, "temppreview.gif")
 
 	// Filter is pulled from https://engineering.giphy.com/how-to-make-gifs-with-ffmpeg/
 	animatedGifFlags := []string{

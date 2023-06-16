@@ -4,14 +4,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/owncast/owncast/config"
 	"github.com/owncast/owncast/core/data"
 	"github.com/owncast/owncast/models"
+	"github.com/owncast/owncast/services/config"
 )
 
 // How often we poll for updates.
-const hardwareMetricsPollingInterval = 2 * time.Minute
-const playbackMetricsPollingInterval = 2 * time.Minute
+const (
+	hardwareMetricsPollingInterval = 2 * time.Minute
+	playbackMetricsPollingInterval = 2 * time.Minute
+)
 
 const (
 	// How often we poll for updates.
@@ -59,8 +61,11 @@ func Start(getStatus func() models.Status) {
 	if host == "" {
 		host = "unknown"
 	}
+
+	c := config.GetConfig()
+
 	labels = map[string]string{
-		"version": config.VersionNumber,
+		"version": c.VersionNumber,
 		"host":    host,
 	}
 
