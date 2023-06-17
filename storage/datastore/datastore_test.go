@@ -1,10 +1,14 @@
-package data
+package datastore
 
 import (
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/owncast/owncast/models"
 )
+
+var _datastore *Datastore
 
 func TestMain(m *testing.M) {
 	dbFile, err := os.CreateTemp(os.TempDir(), "owncast-test-db.db")
@@ -12,7 +16,11 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
-	SetupPersistence(dbFile.Name())
+	ds, err := NewDatastore(dbFile.Name())
+	if err != nil {
+		panic(err)
+	}
+	_datastore = ds
 	m.Run()
 }
 
@@ -87,7 +95,7 @@ func TestCustomType(t *testing.T) {
 	}
 
 	// Save config entry to the database
-	if err := _datastore.Save(ConfigEntry{testKey, &testStruct}); err != nil {
+	if err := _datastore.Save(models.ConfigEntry{testKey, &testStruct}); err != nil {
 		t.Error(err)
 	}
 
@@ -99,7 +107,7 @@ func TestCustomType(t *testing.T) {
 
 	// Get a typed struct out of it
 	var testResult TestStruct
-	if err := entryResult.getObject(&testResult); err != nil {
+	if err := entryResult.GetObject(&testResult); err != nil {
 		t.Error(err)
 	}
 
@@ -119,7 +127,7 @@ func TestStringMap(t *testing.T) {
 	}
 
 	// Save config entry to the database
-	if err := _datastore.Save(ConfigEntry{testKey, &testMap}); err != nil {
+	if err := _datastore.Save(models.ConfigEntry{testKey, &testMap}); err != nil {
 		t.Error(err)
 	}
 
@@ -129,7 +137,7 @@ func TestStringMap(t *testing.T) {
 		t.Error(err)
 	}
 
-	testResult, err := entryResult.getStringMap()
+	testResult, err := entryResult.GetStringMap()
 	if err != nil {
 		t.Error(err)
 	}

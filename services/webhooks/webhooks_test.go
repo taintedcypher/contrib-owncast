@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/owncast/owncast/core/data"
 	"github.com/owncast/owncast/models"
 	jsonpatch "gopkg.in/evanphx/json-patch.v5"
 )
