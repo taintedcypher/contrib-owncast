@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/owncast/owncast/core/data"
+	"github.com/owncast/owncast/storage/configrepository"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -40,7 +40,8 @@ func (c *IndieAuthClient) StartAuthFlow(authHost, userID, accessToken, displayNa
 		return nil, errors.New("Please try again later. Too many pending requests.")
 	}
 
-	serverURL := data.GetServerURL()
+	configRepository := configrepository.Get()
+	serverURL := configRepository.GetServerURL()
 	if serverURL == "" {
 		return nil, errors.New("Owncast server URL must be set when using auth")
 	}
