@@ -537,7 +537,7 @@ func (cr *SqlConfigRepository) GetVideoCodec() string {
 
 // VerifySettings will perform a sanity check for specific settings values.
 func (cr *SqlConfigRepository) VerifySettings() error {
-	c := config.GetConfig()
+	c := config.Get()
 	if len(cr.GetStreamKeys()) == 0 && c.TemporaryStreamKey == "" {
 		log.Errorln("No stream key set. Streaming is disabled. Please set one via the admin or command line arguments")
 	}

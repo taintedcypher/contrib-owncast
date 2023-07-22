@@ -15,10 +15,7 @@ import (
 	"github.com/owncast/owncast/utils"
 )
 
-var (
-	_timer           *time.Ticker
-	configRepository = configrepository.Get()
-)
+var _timer *time.Ticker
 
 // StopThumbnailGenerator will stop the periodic generating of a thumbnail from video.
 func StopThumbnailGenerator() {
@@ -51,7 +48,7 @@ func StartThumbnailGenerator(chunkPath string, variantIndex int) {
 }
 
 func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
-	c := config.GetConfig()
+	c := config.Get()
 
 	// JPG takes less time to encode than PNG
 	outputFile := path.Join(c.TempDir, "thumbnail.jpg")
@@ -90,6 +87,8 @@ func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
 		return nil
 	}
 
+	configRepository := configrepository.Get()
+
 	mostRecentFile := path.Join(framePath, names[0])
 	ffmpegPath := utils.ValidatedFfmpegPath(configRepository.GetFfMpegPath())
 	outputFileTemp := path.Join(c.TempDir, "tempthumbnail.jpg")
@@ -121,7 +120,8 @@ func fireThumbnailGenerator(segmentPath string, variantIndex int) error {
 }
 
 func makeAnimatedGifPreview(sourceFile string, outputFile string) {
-	c := config.GetConfig()
+	configRepository := configrepository.Get()
+	c := config.Get()
 	ffmpegPath := utils.ValidatedFfmpegPath(configRepository.GetFfMpegPath())
 	outputFileTemp := path.Join(c.TempDir, "temppreview.gif")
 

@@ -119,6 +119,7 @@ type ConfigRepository interface {
 	GetDisableSearchIndexing() bool
 	GetVideoServingEndpoint() string
 	SetVideoServingEndpoint(message string) error
+	GetDefaultFederationUsername() string
 }
 
 type SqlConfigRepository struct {
