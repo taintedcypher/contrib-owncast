@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/owncast/owncast/activitypub/apmodels"
 	"github.com/owncast/owncast/activitypub/crypto"
@@ -167,21 +168,21 @@ func XNodeInfo2Controller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	localPostCount, _ := persistence.GetLocalPostCount()
-	canonicalServerURL, err := apmodels.GetCanonicalServerURL()
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+	serverURL := configRepository.GetServerURL()
+	if serverURL == "" {
+		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	canonicalServerURLString := canonicalServerURL.String()
+
+	localPostCount, _ := persistence.GetLocalPostCount()
 
 	res := &response{
 		Organization: Organization{
 			Name:    configRepository.GetServerName(),
-			Contact: canonicalServerURLString,
+			Contact: serverURL,
 		},
 		Server: Server{
-			BaseURL:  canonicalServerURLString,
+			BaseURL:  serverURL,
 			Version:  config.VersionNumber,
 			Name:     "owncast",
 			Software: "owncast",
@@ -238,17 +239,23 @@ func InstanceV1Controller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverURL, err := apmodels.GetCanonicalServerURL()
+	serverURL := configRepository.GetServerURL()
+	if serverURL == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	thumbnail, err := url.Parse(serverURL)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	thumbnail := apmodels.MakeLocalIRIforLogo()
+	thumbnail.Path = "/logo/external"
 	localPostCount, _ := persistence.GetLocalPostCount()
 
 	res := response{
-		URI:              serverURL.String(),
+		URI:              serverURL,
 		Title:            configRepository.GetServerName(),
 		ShortDescription: configRepository.GetServerSummary(),
 		Description:      configRepository.GetServerSummary(),

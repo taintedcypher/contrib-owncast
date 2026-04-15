@@ -77,8 +77,8 @@ func SendLive() error {
 	note.SetActivityStreamsTag(tagProp)
 
 	// Attach an image along with the Federated message.
-	previewURL := apmodels.MakeLocalURLForPath("/")
-	if previewURL != nil {
+	previewURL, err := url.Parse(configRepository.GetServerURL())
+	if err == nil {
 		var imageToAttach string
 		var mediaType string
 		previewGif := filepath.Join(config.TempDir, "preview.gif")
