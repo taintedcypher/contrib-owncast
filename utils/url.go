@@ -10,7 +10,8 @@ import (
 	"golang.org/x/net/idna"
 )
 
-// CanonicalizeHostname returns a DNS-compatible ASCII hostname.
+// CanonicalizeHostname returns a DNS-compatible ASCII hostname. It expects an
+// unwrapped hostname, such as "::1", not URL host syntax, such as "[::1]".
 func CanonicalizeHostname(hostname string) (string, error) {
 	if hostname == "" {
 		return "", errors.New("hostname is required")
@@ -30,6 +31,10 @@ func CanonicalizeHostname(hostname string) (string, error) {
 
 // CanonicalizeHost returns a DNS-compatible ASCII host, preserving any port.
 func CanonicalizeHost(host string) (string, error) {
+	if strings.Contains(host, "://") {
+		return "", errors.New("host appears to be a full URL; pass only the host[:port] portion")
+	}
+
 	u, err := url.Parse("//" + host)
 	if err != nil {
 		return "", err

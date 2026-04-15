@@ -21,25 +21,13 @@ func WebfingerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	instanceHostURL := configRepository.GetServerURL()
-	if instanceHostURL == "" {
-		w.WriteHeader(http.StatusNotFound)
-		log.Warnln("webfinger request rejected! Federation is enabled but server URL is empty.")
-		return
-	}
-
-	instanceHostString := utils.GetHostnameFromURLString(instanceHostURL)
-	if instanceHostString == "" {
-		w.WriteHeader(http.StatusNotFound)
-		log.Warnln("webfinger request rejected! Federation is enabled but server URL is not set properly. data.GetServerURL(): " + configRepository.GetServerURL())
-		return
-	}
-	instanceHostString, err := utils.CanonicalizeHost(instanceHostString)
+	instanceURL, err := apmodels.GetCanonicalServerURL()
 	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		log.Warnln("webfinger request rejected! Federation is enabled but server URL host cannot be canonicalized: " + configRepository.GetServerURL())
 		return
 	}
+	instanceHostString := instanceURL.Host
 
 	resource := r.URL.Query().Get("resource")
 	preAcct, account, foundAcct := strings.Cut(resource, "acct:")
