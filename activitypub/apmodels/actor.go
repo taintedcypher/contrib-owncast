@@ -280,12 +280,12 @@ func MakeServiceForAccount(accountName string) vocab.ActivityStreamsService {
 
 	// Avatar
 	uniquenessString := configRepository.GetLogoUniquenessString()
-	userAvatarURLString := configRepository.GetServerURL() + "/logo/external"
-	userAvatarURL, err := url.Parse(userAvatarURLString)
-	userAvatarURL.RawQuery = "uc=" + uniquenessString
-	if err != nil {
-		log.Errorln("unable to parse user avatar url", userAvatarURLString, err)
+	userAvatarURL := MakeLocalIRIforLogo()
+	if userAvatarURL == nil {
+		userAvatarURL, _ = url.Parse("")
+		log.Errorln("unable to create user avatar url")
 	}
+	userAvatarURL.RawQuery = "uc=" + uniquenessString
 
 	image := streams.NewActivityStreamsImage()
 	imgProp := streams.NewActivityStreamsUrlProperty()

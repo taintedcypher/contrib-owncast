@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"net/http"
-	"net/url"
 
 	"github.com/owncast/owncast/activitypub/apmodels"
 	"github.com/owncast/owncast/activitypub/crypto"
@@ -32,13 +31,7 @@ func NodeInfoController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverURL := configRepository.GetServerURL()
-	if serverURL == "" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	v2, err := url.Parse(serverURL)
+	v2, err := apmodels.GetCanonicalServerURL()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -174,21 +167,21 @@ func XNodeInfo2Controller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverURL := configRepository.GetServerURL()
-	if serverURL == "" {
-		w.WriteHeader(http.StatusNotFound)
+	localPostCount, _ := persistence.GetLocalPostCount()
+	canonicalServerURL, err := apmodels.GetCanonicalServerURL()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
-	localPostCount, _ := persistence.GetLocalPostCount()
+	canonicalServerURLString := canonicalServerURL.String()
 
 	res := &response{
 		Organization: Organization{
 			Name:    configRepository.GetServerName(),
-			Contact: serverURL,
+			Contact: canonicalServerURLString,
 		},
 		Server: Server{
-			BaseURL:  serverURL,
+			BaseURL:  canonicalServerURLString,
 			Version:  config.VersionNumber,
 			Name:     "owncast",
 			Software: "owncast",
@@ -245,23 +238,17 @@ func InstanceV1Controller(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverURL := configRepository.GetServerURL()
-	if serverURL == "" {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
-
-	thumbnail, err := url.Parse(serverURL)
+	serverURL, err := apmodels.GetCanonicalServerURL()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	thumbnail.Path = "/logo/external"
+	thumbnail := apmodels.MakeLocalIRIforLogo()
 	localPostCount, _ := persistence.GetLocalPostCount()
 
 	res := response{
-		URI:              serverURL,
+		URI:              serverURL.String(),
 		Title:            configRepository.GetServerName(),
 		ShortDescription: configRepository.GetServerSummary(),
 		Description:      configRepository.GetServerSummary(),
@@ -302,8 +289,8 @@ func HostMetaController(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	serverURL := configRepository.GetServerURL()
-	if serverURL == "" {
+	serverURL, err := apmodels.GetCanonicalServerURL()
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
@@ -311,7 +298,7 @@ func HostMetaController(w http.ResponseWriter, r *http.Request) {
 	res := fmt.Sprintf(`<?xml version="1.0" encoding="UTF-8"?>
 	<XRD xmlns="http://docs.oasis-open.org/ns/xri/xrd-1.0">
 		<Link rel="lrdd" type="application/json" template="%s/.well-known/webfinger?resource={uri}"/>
-	</XRD>`, serverURL)
+	</XRD>`, serverURL.String())
 
 	if _, err := w.Write([]byte(res)); err != nil {
 		log.Errorln(err)
