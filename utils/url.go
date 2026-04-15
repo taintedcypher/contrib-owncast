@@ -34,6 +34,12 @@ func CanonicalizeHost(host string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if u.Host == "" {
+		return "", errors.New("host is required")
+	}
+	if u.User != nil || u.Path != "" || u.RawQuery != "" || u.Fragment != "" {
+		return "", errors.New("host must not include user info, path, query, or fragment")
+	}
 
 	hostname, err := CanonicalizeHostname(u.Hostname())
 	if err != nil {

@@ -75,3 +75,22 @@ func TestCanonicalizeHost(t *testing.T) {
 		t.Errorf("CanonicalizeHost() = %v, want %v", result, "live.retrospection.xn--q9jyb4c:8443")
 	}
 }
+
+func TestCanonicalizeHostRejectsURLParts(t *testing.T) {
+	tests := []string{
+		"",
+		"live.retrospection.みんな/path",
+		"live.retrospection.みんな?query=true",
+		"live.retrospection.みんな#fragment",
+		"user@live.retrospection.みんな",
+		"https://live.retrospection.みんな",
+	}
+
+	for _, tt := range tests {
+		t.Run(tt, func(t *testing.T) {
+			if _, err := CanonicalizeHost(tt); err == nil {
+				t.Errorf("CanonicalizeHost(%q) should return an error", tt)
+			}
+		})
+	}
+}
