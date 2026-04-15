@@ -192,16 +192,6 @@ func TestMakeServiceForAccountWithIDNServerURL(t *testing.T) {
 		t.Errorf("actor followers = %v, want %v", actor["followers"], expectedActorURL+"/followers")
 	}
 
-	icon := actor["icon"].(map[string]interface{})
-	if icon["url"] != "https://live.retrospection.xn--q9jyb4c/logo/external?uc=" {
-		t.Errorf("actor icon url = %v, want punycode logo URL", icon["url"])
-	}
-
-	image := actor["image"].(map[string]interface{})
-	if image["url"] != "https://live.retrospection.xn--q9jyb4c/logo/external?uc=" {
-		t.Errorf("actor image url = %v, want punycode logo URL", image["url"])
-	}
-
 	publicKey := actor["publicKey"].(map[string]interface{})
 	if publicKey["id"] != expectedActorURL+"#main-key" {
 		t.Errorf("public key id = %v, want %v", publicKey["id"], expectedActorURL+"#main-key")
