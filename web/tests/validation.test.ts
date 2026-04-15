@@ -39,10 +39,17 @@ describe('test fediverse account validation', () => {
     expect(isValidFediverseAccount('retrots3m@live.retrospection.みんな')).toBe(true);
   });
 
+  test('should accept unicode domain labels', () => {
+    expect(isValidFediverseAccount('person@bière.be')).toBe(true);
+    expect(isValidFediverseAccount('person@みんな.みんな')).toBe(true);
+  });
+
   test('should reject malformed accounts', () => {
     expect(isValidFediverseAccount('retrots3m')).toBe(false);
     expect(isValidFediverseAccount('retrots3m@')).toBe(false);
     expect(isValidFediverseAccount('@live.retrospection.みんな')).toBe(false);
     expect(isValidFediverseAccount('retrots3m@live.retrospection.みんな/path')).toBe(false);
+    expect(isValidFediverseAccount('retrots3m@localhost')).toBe(false);
+    expect(isValidFediverseAccount('retrots3m@owncast')).toBe(false);
   });
 });

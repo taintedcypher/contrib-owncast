@@ -75,7 +75,15 @@ export function isValidFediverseAccount(account: string): boolean {
 
   try {
     const parsed = new URL(`https://${host}`);
-    return parsed.hostname !== '' && parsed.pathname === '/' && parsed.search === '' && parsed.hash === '';
+    const hostname = parsed.hostname;
+
+    return (
+      hostname !== '' &&
+      hostname.includes('.') &&
+      parsed.pathname === '/' &&
+      parsed.search === '' &&
+      parsed.hash === ''
+    );
   } catch (e) {
     return false;
   }
